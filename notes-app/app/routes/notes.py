@@ -6,7 +6,8 @@ router = APIRouter(prefix="/notes", tags=["notes"])
 class Priority(str, Enum):
     low = "low"
     medium = "medium"
-    high = "high"    
+    high = "high"
+        
 notes_list = [];
 @router.get("/")
 async def greetings():
@@ -29,10 +30,25 @@ async def get_notes(
 
 @router.get("/search_note")
 async def search_note(
-    title: Annotated[str | None, Query()] = None, 
-    id: Annotated[str | None, Query()] = None
+    title: Annotated[str | None, Query()] = None,
+    note_id: Annotated[int | None, Query()] = None
 ):
-    return notes_list;
+
+    if title is not None:
+        for note in notes_list:
+            if note["title"].lower() == title.lower():
+                return {"note": note}
+
+        return {"message": "Note not found"}
+
+    if note_id is not None:
+        for note in notes_list:
+            if note["note_id"] == note_id:
+                return {"note": note}
+
+        return {"message": "Note not found"}
+
+    return {"message": "Please provide title or note_id"}
 
 @router.post("/create_note")
 async def create_note(note: Note):
